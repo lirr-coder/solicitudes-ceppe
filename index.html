@@ -1,0 +1,413 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+<meta http-equiv="Pragma" content="no-cache">
+<meta http-equiv="Expires" content="0">
+<title>Solicitudes CEPPE — Registrar</title>
+<style>
+  :root{
+    --bg:#f2f1ee;
+    --card:#ffffff;
+    --ink:#111111;
+    --muted:#8a8a8a;
+    --line:#e7e6e2;
+    --red:#d64545;
+    --red-bg:#fbe9e9;
+    --amber:#9a6b00;
+    --amber-bg:#fdf3d9;
+    --gray:#55534e;
+    --gray-bg:#eceae6;
+    --green:#2e7d55;
+    --azul:#037a9c;
+    --radius:18px;
+    --mono:"SF Mono",ui-monospace,"Cascadia Mono","Roboto Mono",Menlo,Consolas,monospace;
+    --sans:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{
+    background:var(--bg);
+    font-family:var(--sans);
+    color:var(--ink);
+    -webkit-font-smoothing:antialiased;
+    padding:28px 16px 60px;
+    max-width:520px;
+    margin:0 auto;
+  }
+  .head h1{font-size:26px;font-weight:700;letter-spacing:-.3px}
+  .head p{font-family:var(--mono);font-size:13px;color:var(--muted);margin-top:4px;letter-spacing:.2px}
+
+  .card{
+    background:var(--card);
+    border-radius:var(--radius);
+    padding:22px;
+    margin-top:22px;
+    box-shadow:0 1px 2px rgba(0,0,0,.03);
+  }
+
+  .lbl-row{display:flex;justify-content:space-between;align-items:baseline;margin:0 0 9px}
+  label.lbl{
+    display:block;
+    font-family:var(--mono);
+    font-size:11px;
+    letter-spacing:.8px;
+    color:var(--muted);
+    text-transform:uppercase;
+  }
+  .lbl-row label.lbl{margin:0}
+  .field > label.lbl{margin:0 0 9px}
+  .field{margin-bottom:20px}
+
+  .link-btn{
+    font-family:var(--sans);font-size:13px;font-weight:600;
+    background:none;border:none;color:var(--azul);cursor:pointer;padding:0
+  }
+
+  select, input[type=text], textarea{
+    width:100%;
+    font-family:var(--sans);
+    font-size:16px;
+    padding:14px 15px;
+    border:1px solid var(--line);
+    border-radius:12px;
+    background:#fff;
+    color:var(--ink);
+    outline:none;
+    transition:.12s;
+  }
+  textarea{min-height:120px;resize:vertical;line-height:1.4}
+  select:focus, input:focus, textarea:focus{border-color:#b9b8b4}
+  input::placeholder, textarea::placeholder{color:#c2c1bd}
+
+  .new-client{
+    display:none;
+    margin-top:10px;
+    background:#faf9f7;border:1px solid var(--line);border-radius:12px;padding:12px;
+  }
+  .new-client.open{display:block}
+  .new-client .row{display:grid;grid-template-columns:1fr auto;gap:8px}
+  .new-client button{
+    font-family:var(--sans);font-size:15px;font-weight:600;
+    border:none;border-radius:11px;padding:0 16px;
+    background:var(--ink);color:#fff;cursor:pointer
+  }
+  .new-client button:disabled{opacity:.35;cursor:not-allowed}
+  .new-client small{display:block;font-size:12px;color:var(--muted);margin-top:8px}
+
+  .seg{
+    display:grid;
+    grid-template-columns:1fr 1fr 1fr;
+    background:#f4f3f0;
+    border-radius:12px;
+    padding:4px;
+    gap:4px;
+  }
+  .seg button{
+    font-family:var(--sans);
+    font-size:15px;
+    font-weight:600;
+    padding:13px 0;
+    border:none;
+    border-radius:9px;
+    background:transparent;
+    color:var(--muted);
+    cursor:pointer;
+    transition:.12s;
+  }
+  .seg button.on-Alta{background:var(--red-bg);color:var(--red)}
+  .seg button.on-Media{background:var(--amber-bg);color:var(--amber)}
+  .seg button.on-Baja{background:var(--gray-bg);color:var(--gray)}
+  .hint{font-size:12px;color:var(--muted);margin-top:8px;min-height:15px}
+
+  .submit{
+    width:100%;
+    font-family:var(--sans);
+    font-size:16px;
+    font-weight:600;
+    color:#fff;
+    background:var(--ink);
+    border:none;
+    border-radius:14px;
+    padding:17px 0;
+    margin-top:6px;
+    cursor:pointer;
+    transition:.12s;
+  }
+  .submit:active{transform:scale(.99)}
+  .submit:disabled{opacity:.35;cursor:not-allowed}
+
+  .toast{
+    position:fixed;left:50%;bottom:26px;transform:translateX(-50%) translateY(140px);
+    background:var(--ink);color:#fff;font-size:14px;font-weight:500;
+    padding:14px 22px;border-radius:30px;box-shadow:0 6px 20px rgba(0,0,0,.18);
+    transition:transform .28s cubic-bezier(.2,.8,.2,1);z-index:50;
+    display:flex;align-items:center;gap:9px;max-width:calc(100% - 32px)
+  }
+  .toast.show{transform:translateX(-50%) translateY(0)}
+  .toast .dot{width:8px;height:8px;border-radius:50%;background:var(--green);flex-shrink:0}
+
+  .foot{font-family:var(--mono);font-size:11px;color:#b8b7b3;text-align:center;margin-top:26px;letter-spacing:.3px}
+  .foot a{color:var(--azul);text-decoration:none}
+</style>
+</head>
+<body>
+
+  <div class="head">
+    <h1>Solicitudes CEPPE</h1>
+    <p>Registrar lo que pidió un cliente</p>
+  </div>
+
+  <div class="card">
+
+    <!-- CLIENTE -->
+    <div class="field">
+      <div class="lbl-row">
+        <label class="lbl" for="cliente">Cliente</label>
+        <button type="button" class="link-btn" id="toggleNuevo">+ Nuevo cliente</button>
+      </div>
+      <select id="cliente"></select>
+
+      <div class="new-client" id="nuevoBox">
+        <div class="row">
+          <input type="text" id="nuevoNombre" placeholder="Nombre del cliente" autocomplete="off">
+          <button type="button" id="agregarCliente" disabled>Agregar</button>
+        </div>
+        <small>Escríbelo igual a como lo usas en todo lado (Ej: "Dra Yhani", no "Yhani").</small>
+      </div>
+    </div>
+
+    <!-- SOLICITUD -->
+    <div class="field">
+      <label class="lbl" for="solicitud">Qué pidió</label>
+      <textarea id="solicitud" placeholder="Ej: Pausar el anuncio de la promo de diciembre y subir $2 al de mensajes"></textarea>
+    </div>
+
+    <!-- URGENCIA -->
+    <div class="field">
+      <label class="lbl">Urgencia</label>
+      <div class="seg" id="seg">
+        <button type="button" data-u="Alta">Alta</button>
+        <button type="button" data-u="Media">Media</button>
+        <button type="button" data-u="Baja">Baja</button>
+      </div>
+      <p class="hint" id="hint"></p>
+    </div>
+
+    <button class="submit" id="submit" disabled>Registrar solicitud</button>
+  </div>
+
+  <p class="foot">CEPPE Media · guarda en Google Sheets · <a id="sheetLink" href="https://docs.google.com/spreadsheets/d/12XoBdcEW9cMubCyjaAIZLw1kGCkZi7IZAeXZskxnacI/edit" target="_blank" rel="noopener">ver Sheet →</a></p>
+
+  <div class="toast" id="toast"><span class="dot"></span><span id="toastMsg">Solicitud registrada</span></div>
+
+<script>
+// ---- CONFIG ----
+// Pega aquí la URL del Apps Script Web App (termina en /exec). Vacío = modo demo (no guarda nada).
+const SHEET_ENDPOINT = "https://script.google.com/macros/s/AKfycbwXxR8rLTSR0WuEck82VhBTF3lHfTyMss1b7dPayOIKFPjG7rOxzIPo4g2MIYI_vNhp/exec";
+const CLIENTE_DEFAULT = "CEPPE Media";
+
+// Lista de respaldo: se muestra al instante y se reemplaza con la del Sheet apenas carga
+const CLIENTES_BASE = ["CEPPE Media","Teque Joe","TAI","CAGI","Humos","Dra Yhani","Lemaire Adames",
+  "FIV","Michael Abadi","Hansa","Cook Pro","AVVIA"];
+
+const HINTS = {
+  Alta:"Esta semana sin falta.",
+  Media:"En la próxima revisión.",
+  Baja:"Cuando se pueda."
+};
+
+const state = { urgencia:null, clientes:[] };
+
+const clienteSel  = document.getElementById("cliente");
+const solicitudTx = document.getElementById("solicitud");
+const segBtns     = document.querySelectorAll("#seg button");
+const hint        = document.getElementById("hint");
+const submitBtn   = document.getElementById("submit");
+const nuevoBox    = document.getElementById("nuevoBox");
+const nuevoNombre = document.getElementById("nuevoNombre");
+const agregarBtn  = document.getElementById("agregarCliente");
+const toggleNuevo = document.getElementById("toggleNuevo");
+
+// ---------- clientes ----------
+function cacheGet(){
+  try{ const v = JSON.parse(localStorage.getItem("ceppe_clientes")||"null"); return Array.isArray(v)&&v.length?v:null; }
+  catch(e){ return null; }
+}
+function cacheSet(lista){
+  try{ localStorage.setItem("ceppe_clientes", JSON.stringify(lista)); }catch(e){}
+}
+
+function pintarClientes(lista, seleccionar){
+  const actual = seleccionar || clienteSel.value || CLIENTE_DEFAULT;
+  state.clientes = lista.slice();
+  clienteSel.innerHTML = "";
+  lista.forEach(nombre=>{
+    const o = document.createElement("option");
+    o.value = nombre; o.textContent = nombre;
+    clienteSel.appendChild(o);
+  });
+  const existe = lista.some(c=>c===actual);
+  clienteSel.value = existe ? actual : (lista.includes(CLIENTE_DEFAULT) ? CLIENTE_DEFAULT : lista[0]);
+  validate();
+}
+
+async function cargarClientes(seleccionar){
+  if(!SHEET_ENDPOINT) return;
+  try{
+    const r = await fetch(SHEET_ENDPOINT + "?action=clientes&t=" + Date.now());
+    const data = await r.json();
+    if(data.ok && Array.isArray(data.clientes) && data.clientes.length){
+      const lista = data.clientes.slice();
+      // si el cliente recién agregado aún no aparece en la respuesta, se conserva
+      if(seleccionar && !lista.some(c=>c.toLowerCase()===seleccionar.toLowerCase())) lista.push(seleccionar);
+      cacheSet(lista);
+      pintarClientes(lista, seleccionar);
+    }
+  }catch(e){
+    // sin conexión al Sheet: se queda la lista local
+  }
+}
+
+toggleNuevo.addEventListener("click",()=>{
+  nuevoBox.classList.toggle("open");
+  toggleNuevo.textContent = nuevoBox.classList.contains("open") ? "Cancelar" : "+ Nuevo cliente";
+  if(nuevoBox.classList.contains("open")) nuevoNombre.focus();
+  else { nuevoNombre.value=""; agregarBtn.disabled=true; }
+});
+
+nuevoNombre.addEventListener("input",()=>{
+  agregarBtn.disabled = !nuevoNombre.value.trim();
+});
+nuevoNombre.addEventListener("keydown",e=>{
+  if(e.key==="Enter" && !agregarBtn.disabled){ e.preventDefault(); agregarBtn.click(); }
+});
+
+agregarBtn.addEventListener("click", async ()=>{
+  const nombre = nuevoNombre.value.trim().replace(/\s+/g," ");
+  if(!nombre) return;
+
+  const repetido = state.clientes.find(c=>c.toLowerCase()===nombre.toLowerCase());
+  if(repetido){
+    clienteSel.value = repetido;
+    cerrarNuevo();
+    showToast("Ya existía: " + repetido);
+    validate();
+    return;
+  }
+
+  agregarBtn.disabled = true; agregarBtn.textContent = "…";
+  const res = await enviar({ action:"nuevo_cliente", nombre });
+  agregarBtn.textContent = "Agregar";
+
+  if(res.estado==="ok" || res.estado==="demo"){
+    const lista = state.clientes.concat(nombre).sort((a,b)=>{
+      if(a===CLIENTE_DEFAULT) return -1;
+      if(b===CLIENTE_DEFAULT) return 1;
+      return 0;
+    });
+    cacheSet(lista);
+    pintarClientes(lista, nombre);
+    cerrarNuevo();
+    showToast(res.estado==="demo" ? "Demo: cliente agregado (no se guardó)" : "Cliente agregado");
+    cargarClientes(nombre);
+  }else{
+    agregarBtn.disabled = false;
+    showToast(res.mensaje || "No se pudo agregar el cliente", true);
+  }
+});
+
+function cerrarNuevo(){
+  nuevoBox.classList.remove("open");
+  toggleNuevo.textContent = "+ Nuevo cliente";
+  nuevoNombre.value = "";
+  agregarBtn.disabled = true;
+}
+
+// ---------- urgencia ----------
+segBtns.forEach(b=>b.addEventListener("click",()=>{
+  state.urgencia = b.dataset.u;
+  segBtns.forEach(x=>x.className="");
+  b.className = "on-" + state.urgencia;
+  hint.textContent = HINTS[state.urgencia];
+  validate();
+}));
+
+solicitudTx.addEventListener("input",validate);
+clienteSel.addEventListener("change",validate);
+
+function validate(){
+  submitBtn.disabled = !(clienteSel.value && solicitudTx.value.trim() && state.urgencia);
+}
+
+// ---------- envío ----------
+// Devuelve {estado:"ok"|"error"|"incierto"|"demo", mensaje}
+async function enviar(payload){
+  if(!SHEET_ENDPOINT){
+    await new Promise(r=>setTimeout(r,400));
+    return { estado:"demo" };
+  }
+  try{
+    const r = await fetch(SHEET_ENDPOINT,{
+      method:"POST",
+      headers:{"Content-Type":"text/plain;charset=utf-8"},
+      body:JSON.stringify(payload)
+    });
+    const data = await r.json();
+    return data.ok ? { estado:"ok", data } : { estado:"error", mensaje:data.error };
+  }catch(e){
+    // La petición pudo haber llegado aunque no se pudo leer la respuesta
+    return { estado:"incierto", mensaje:"No se pudo confirmar. Revisa el Sheet antes de reenviar." };
+  }
+}
+
+submitBtn.addEventListener("click", async ()=>{
+  const payload = {
+    action:"solicitud",
+    cliente: clienteSel.value,
+    solicitud: solicitudTx.value.trim(),
+    urgencia: state.urgencia
+  };
+
+  submitBtn.disabled = true; submitBtn.textContent = "Guardando…";
+  const res = await enviar(payload);
+  submitBtn.textContent = "Registrar solicitud";
+
+  if(res.estado==="ok"){
+    showToast("Registrada · " + (res.data.id || payload.cliente));
+    resetForm();
+  }else if(res.estado==="demo"){
+    showToast("Demo: no se guardó (falta la URL del Apps Script)");
+    resetForm();
+  }else{
+    showToast(res.mensaje || "Error al guardar", true);
+    validate();
+  }
+});
+
+function resetForm(){
+  solicitudTx.value = "";
+  state.urgencia = null;
+  segBtns.forEach(x=>x.className="");
+  hint.textContent = "";
+  clienteSel.value = state.clientes.includes(CLIENTE_DEFAULT) ? CLIENTE_DEFAULT : clienteSel.value;
+  validate();
+}
+
+let toastTimer;
+function showToast(msg, err){
+  const t = document.getElementById("toast");
+  document.getElementById("toastMsg").textContent = msg;
+  t.querySelector(".dot").style.background = err ? "var(--red)" : "var(--green)";
+  t.classList.add("show");
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(()=>t.classList.remove("show"), err ? 4000 : 2400);
+}
+
+// ---------- inicio ----------
+pintarClientes(cacheGet() || CLIENTES_BASE, CLIENTE_DEFAULT);
+cargarClientes(CLIENTE_DEFAULT);
+</script>
+</body>
+</html>
